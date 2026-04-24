@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Join College0</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Applying As</label>
+                        <select class="form-select" name="type" required onchange="toggleGPA(this)">
+                            <option value="student">Student</option>
+                            <option value="instructor">Instructor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="gpa-group">
+                        <label for="gpa" class="form-label">Current GPA (if applicable)</label>
+                        <input type="number" step="0.01" class="form-control" id="gpa" name="gpa">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleGPA(select) {
+        const gpaGroup = document.getElementById('gpa-group');
+        gpaGroup.style.display = select.value === 'student' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

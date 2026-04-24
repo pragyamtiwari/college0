@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to College0</h1>
+        <p class="col-md-8 fs-4">An AI-enabled graduate college management system. Experience the future of education management today.</p>
+        {% if not current_user.is_authenticated %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('visitor.apply') }}">Apply Now</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h3>Highest Rated Classes</h3>
+        <ul class="list-group">
+            {% for class, rating in highest_rated %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ class.name }}
+                    <span class="badge bg-success rounded-pill">{{ "%.1f"|format(rating) }} ★</span>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">No ratings yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <h3>Lowest Rated Classes</h3>
+        <ul class="list-group">
+            {% for class, rating in lowest_rated %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ class.name }}
+                    <span class="badge bg-danger rounded-pill">{{ "%.1f"|format(rating) }} ★</span>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">No ratings yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <h3>Top Students (GPA)</h3>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between">
+                Alice Smith
+                <span class="badge bg-primary">4.0 GPA</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                Bob Jones
+                <span class="badge bg-primary">3.9 GPA</span>
+            </li>
+        </ul>
+        <div class="mt-4 p-3 border rounded bg-white shadow-sm">
+            <h5>🤖 Ask our AI</h5>
+            <p class="small text-muted">Use the chatbot in the corner to ask about classes, rules, and requirements!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

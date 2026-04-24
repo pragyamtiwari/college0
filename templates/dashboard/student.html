@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body text-center">
+                <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=0D6EFD&color=fff" class="rounded-circle mb-3" width="100">
+                <h5>{{ current_user.name }}</h5>
+                <p class="text-muted small">Student ID: #{{ current_user.id }}</p>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span>GPA:</span>
+                    <span class="fw-bold text-primary">N/A</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Warnings:</span>
+                    <span class="badge bg-{{ 'danger' if current_user.warning_count >= 2 else 'warning text-dark' if current_user.warning_count == 1 else 'success' }}">
+                        {{ current_user.warning_count }}
+                    </span>
+                </div>
+                {% if warnings %}
+                <div class="mt-3 text-start small border p-2 bg-light">
+                    <strong>Recent Warnings:</strong>
+                    <ul class="mb-0 ps-3">
+                        {% for w in warnings %}
+                            <li class="text-danger">{{ w.reason }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between">
+                        <span>Current Enrollments</span>
+                        <a href="{{ url_for('student.register') }}" class="btn btn-sm btn-light py-0">Register</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                        {% for item in enrollments_data %}
+                            {% set enrollment = item.enrollment %}
+                            {% set cls = item.class %}
+                            {% set buddies = item.buddies %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ cls.name }}</strong>
+                                    <div class="text-muted extra-small" style="font-size: 0.7em;">{{ cls.schedule }}</div>
+                                    {% if enrollment.study_buddy_opt_in %}
+                                        <div class="mt-1">
+                                            <span class="badge bg-dark extra-small">Buddy Match: ON</span>
+                                            {% if buddies %}
+                                                <div class="small mt-1 text-primary">Matched: {% for b in buddies %}{{ b.name }} ({{ b.email }}){{ ", " if not loop.last }}{% endfor %}</div>
+                                            {% else %}
+                                                <div class="small text-muted extra-small">No matches yet.</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end">
+                                    {% if enrollment.is_waitlisted %}
+                                        <span class="badge bg-warning text-dark">Waitlisted</span>
+                                    {% else %}
+                                        <div class="mb-1">
+                                            {% if not enrollment.grade %}
+                                                <button class="btn btn-sm btn-outline-info py-0" data-bs-toggle="modal" data-bs-target="#reviewModal{{ cls.id }}">Rate</button>
+                                            {% endif %}
+                                            <span class="badge bg-success">Enrolled</span>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('student.study_buddy_opt_in') }}">
+                                            <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                            <button type="submit" class="btn btn-{{ 'danger' if enrollment.study_buddy_opt_in else 'primary' }} btn-sm extra-small py-0">
+                                                {{ 'Opt Out Buddy' if enrollment.study_buddy_opt_in else 'Find Buddy' }}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+
+                                    <!-- Review Modal -->
+                                    <div class="modal fade" id="reviewModal{{ cls.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="{{ url_for('student.review') }}">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Review Class: {{ cls.name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="class_id" value="{{ cls.id }}">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Stars</label>
+                                                            <select name="stars" class="form-select">
+                                                                <option value="5">5 - Excellent</option>
+                                                                <option value="4">4 - Good</option>
+                                                                <option value="3">3 - Average</option>
+                                                                <option value="2">2 - Poor</option>
+                                                                <option value="1">1 - Terrible</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Review Content</label>
+                                                            <textarea name="content" class="form-control" rows="3" required placeholder="Describe your experience..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">Post Review</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% else %}
+                            <li class="list-group-item text-muted text-center p-3">No classes currently enrolled.</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-dark text-white">Study Buddy Finder</div>
+                    <div class="card-body">
+                        <p class="small">Matching is enabled per course. Once you opt-in for a course, we'll show you other students who also opted in!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-danger text-white">Report an Issue</div>
+                    <div class="card-body">
+                        <p class="small">File a complaint against a student or instructor.</p>
+                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#complaintModal">File Complaint</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaint Modal -->
+        <div class="modal fade" id="complaintModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ url_for('student.complaint') }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">File Complaint</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Target ID (User #)</label>
+                                <input type="number" name="target_id" class="form-control" placeholder="ID of the person you are reporting" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3" required placeholder="Describe the incident..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">Academic History</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Class</th>
+                            <th>Semester</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="3" class="text-center text-muted">No records found.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

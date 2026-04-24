@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow-sm mb-4 bg-dark text-white text-center">
+            <div class="card-body">
+                <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=6C757D&color=fff" class="rounded-circle mb-3" width="100">
+                <h5>{{ current_user.name }}</h5>
+                <p class="small opacity-75">Registrar / Superuser</p>
+                <div class="badge bg-warning text-dark">Administrative Powers</div>
+            </div>
+        </div>
+        <div class="list-group shadow-sm">
+            <a href="{{ url_for('registrar.dashboard') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint == 'registrar.dashboard' }}">Dashboard Overview</a>
+            <a href="{{ url_for('registrar.applications') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint == 'registrar.applications' }}">Pending Applications</a>
+            <a href="{{ url_for('registrar.classes') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint == 'registrar.classes' }}">Manage Classes</a>
+            <a href="{{ url_for('registrar.semesters') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint == 'registrar.semesters' }}">Manage Semesters</a>
+            <a href="{{ url_for('registrar.complaints') }}" class="list-group-item list-group-item-action {{ 'active' if request.endpoint == 'registrar.complaints' }}">Complaints Desk</a>
+            <a href="#" class="list-group-item list-group-item-action">Taboo Words</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-primary text-white shadow-sm">
+                    <div class="card-body">
+                        <h3>{{ student_count }}</h3>
+                        <p class="mb-0">Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white shadow-sm">
+                    <div class="card-body">
+                        <h3>{{ instructor_count }}</h3>
+                        <p class="mb-0">Instructors</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-warning text-dark shadow-sm">
+                    <div class="card-body">
+                        <h3>{{ pending_apps }}</h3>
+                        <p class="mb-0">Pending Apps</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">System Logs / Quick Actions</div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('registrar.applications') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        Review Pending Applications
+                        <span class="badge bg-warning text-dark">{{ pending_apps }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

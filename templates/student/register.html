@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between">
+        <h3 class="mb-0">Course Registration: {{ current_sem.name }}</h3>
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-light btn-sm">Dashboard</a>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small">You can register for up to 4 courses. Registration is open during Period 2.</p>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Schedule</th>
+                        <th>Instructor</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cls in classes %}
+                    <tr>
+                        <td><strong>{{ cls.name }}</strong></td>
+                        <td>{{ cls.schedule }}</td>
+                        <td>{{ cls.instructor_id }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if cls.status == 'open' else 'danger' }}">
+                                {{ cls.status|capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <form method="POST">
+                                <input type="hidden" name="class_id" value="{{ cls.id }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Register</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">No courses available for registration.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

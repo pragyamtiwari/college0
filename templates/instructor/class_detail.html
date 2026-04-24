@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-success text-white d-flex justify-content-between">
+        <h3 class="mb-0">{{ cls.name }} - Students</h3>
+        <a href="{{ url_for('instructor.dashboard') }}" class="btn btn-outline-light btn-sm">Dashboard</a>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info py-2 small">
+            Semester: {{ sem.name }} | Current Period: {{ sem.current_period }}
+        </div>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Waitlisted</th>
+                    <th>Current Grade</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment, student in enrollments %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'warning text-dark' if enrollment.is_waitlisted else 'success' }}">
+                            {{ 'Yes' if enrollment.is_waitlisted else 'No' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="fw-bold">{{ enrollment.grade if enrollment.grade else 'N/A' }}</span>
+                    </td>
+                    <td>
+                        {% if sem.current_period == 4 and not enrollment.is_waitlisted %}
+                        <form method="POST" action="{{ url_for('instructor.grade') }}" class="d-flex gap-1">
+                            <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                            <select name="grade" class="form-select form-select-sm" style="width: 70px;">
+                                <option value="A" {{ 'selected' if enrollment.grade == 'A' }}>A</option>
+                                <option value="B" {{ 'selected' if enrollment.grade == 'B' }}>B</option>
+                                <option value="C" {{ 'selected' if enrollment.grade == 'C' }}>C</option>
+                                <option value="D" {{ 'selected' if enrollment.grade == 'D' }}>D</option>
+                                <option value="F" {{ 'selected' if enrollment.grade == 'F' }}>F</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-success">Update</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted small">Grading in P4</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted">No students enrolled.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

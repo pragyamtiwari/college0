@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white">Create Semester</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Semester Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Fall 2026" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">Manage Semesters</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Current Period</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sem in semesters %}
+                        <tr>
+                            <td>{{ sem.name }}</td>
+                            <td>Period {{ sem.current_period }}</td>
+                            <td>
+                                {% if sem.current_period == 1 %}Class Setup
+                                {% elif sem.current_period == 2 %}Registration
+                                {% elif sem.current_period == 3 %}Running
+                                {% elif sem.current_period == 4 %}Grading
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('registrar.next_period', sem_id=sem.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        {{ 'Next Period' if sem.current_period < 4 else 'Finalize Semester' }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

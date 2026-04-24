@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-dark text-white d-flex justify-content-between">
+        <h3 class="mb-0">Complaints Desk</h3>
+        <a href="{{ url_for('registrar.dashboard') }}" class="btn btn-sm btn-outline-light">Back</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Filer ID</th>
+                    <th>Target ID</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Resolution / Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comp in complaints %}
+                <tr>
+                    <td>{{ comp.id }}</td>
+                    <td>{{ comp.filer_id }}</td>
+                    <td>{{ comp.target_id }}</td>
+                    <td class="small">{{ comp.description }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'warning text-dark' if comp.status == 'pending' else 'success' }}">
+                            {{ comp.status|capitalize }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if comp.status == 'pending' %}
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#resolveModal{{ comp.id }}">Resolve</button>
+                        
+                        <!-- Resolve Modal -->
+                        <div class="modal fade" id="resolveModal{{ comp.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="POST">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Resolve Complaint #{{ comp.id }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="comp_id" value="{{ comp.id }}">
+                                            <div class="mb-3">
+                                                <label class="form-label">Action</label>
+                                                <select name="action" class="form-select">
+                                                    <option value="punish">Punish Target (1 Warning)</option>
+                                                    <option value="warn_filer">Warn Filer (1 Warning for false report)</option>
+                                                    <option value="none">Close with no action</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Resolution Note</label>
+                                                <textarea name="resolution" class="form-control" rows="2" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Resolve</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <span class="text-muted small">{{ comp.resolution }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center p-4">No complaints recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
